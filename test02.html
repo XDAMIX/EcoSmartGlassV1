@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Smart Glass – Démo Réaliste</title>
+
+    <style>
+
+
+        .smart-glass-container {
+            width: 100%;
+            max-width: 900px;
+            padding: 40px 20px;
+        }
+
+        .scene {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            border-radius: 18px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+        }
+
+        .scene img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* ============================= */
+        /* 🪟 BASE COMMUNE SMART GLASS */
+        /* ============================= */
+        .glass {
+            position: absolute;
+            pointer-events: none;
+        }
+
+        /* Couche couleur */
+        .glass-color {
+            position: absolute;
+            inset: 0;
+            background: rgba(40, 40, 40, 0);
+            /* 🔧 GRIS FONCÉ */
+            transition: background 0.4s ease;
+        }
+
+        /* Couche flou */
+        .glass-blur {
+            position: absolute;
+            inset: 0;
+            backdrop-filter: blur(0px);
+            background: rgba(40, 40, 40, 0);
+            /* 🔧 IMPORTANT */
+            transition: backdrop-filter 0.4s ease, background 0.4s ease;
+        }
+
+        /* clip-path appliqué à tout */
+        .glass,
+        .glass-color,
+        .glass-blur {
+            clip-path: inherit;
+        }
+
+        /* ============================= */
+        /* 🪟 VITRE DROITE */
+        /* ============================= */
+        .glass-right {
+            top: 10%;
+            left: 49%;
+            width: 45%;
+            height: 78%;
+            clip-path: polygon(3% 14%,
+                    79.3% 2%,
+                    79.3% 100%,
+                    3% 94%);
+
+            /* background-color: rgba(0, 0, 0, 0.5); */
+        }
+
+        /* ============================= */
+        /* 🪟 VITRE GAUCHE */
+        /* ============================= */
+        .glass-left {
+            top: 22%;
+            left: 20%;
+            width: 36%;
+            height: 60%;
+            clip-path: polygon(1% 12.5%,
+                    78.5% 0%,
+                    78.5% 99%,
+                    34.6% 95%,
+                    34.4% 83.5%,
+                    1% 81.8%);
+
+
+        }
+
+
+
+        /* ============================= */
+        /* 🎛 CONTROLS */
+        /* ============================= */
+        .controls {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .temperature {
+            font-size: clamp(22px, 4vw, 32px);
+            font-weight: bold;
+            margin-bottom: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            max-width: 500px;
+        }
+
+
+        /* ============================= */
+        /* 🌞 EFFET SOLEIL */
+        /* ============================= */
+        .sunlight {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(circle at 75% 35%,
+                    rgba(255, 210, 120, 0.35),
+                    rgba(255, 200, 90, 0.15),
+                    rgba(255, 200, 90, 0.05),
+                    transparent 60%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            mix-blend-mode: screen;
+            animation: heatPulse 6s ease-in-out infinite;
+        }
+
+
+        @keyframes heatPulse {
+
+            0%,
+            100% {
+                filter: brightness(1);
+            }
+
+            50% {
+                filter: brightness(1.15);
+            }
+        }
+    </style>
+
+
+
+</head>
+
+<body>
+
+    <div class="smart-glass-container">
+
+        <div class="scene">
+            <img src="./assets/images/windows002.jpg" alt="Fenêtre avec double vitrage">
+            <div class="sunlight"></div>
+            <!-- Vitre gauche -->
+            <div class="glass glass-left">
+                <div class="glass-color"></div>
+                <div class="glass-blur"></div>
+            </div>
+
+            <!-- Vitre droite -->
+            <div class="glass glass-right">
+                <div class="glass-color"></div>
+                <div class="glass-blur"></div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="temperature" id="tempValue">14°C</div>
+            <input type="range" min="0" max="40" value="14" id="slider">
+        </div>
+
+    </div>
+
+
+
+    <script>
+        const slider = document.getElementById("slider");
+        const tempValue = document.getElementById("tempValue");
+        const glasses = document.querySelectorAll(".glass");
+
+        slider.addEventListener("input", () => {
+            const temp = Number(slider.value);
+
+            tempValue.style.transform = "translateY(-6px)";
+            setTimeout(() => {
+                tempValue.textContent = temp + "°C";
+                tempValue.style.transform = "translateY(0)";
+            }, 120);
+
+            const progress = temp <= 14 ? 0 : (temp - 14) / 26;
+            const opacity = progress * 0.6;
+            const blur = progress * 18;
+
+            glasses.forEach(glass => {
+                glass.querySelector(".glass-color").style.background =
+                    `rgba(40,40,40,${opacity})`;
+
+                glass.querySelector(".glass-blur").style.backdropFilter =
+                    `blur(${blur}px)`;
+
+                glass.querySelector(".glass-blur").style.background =
+                    `rgba(40,40,40,${opacity * 0.6})`;
+            });
+        });
+    </script>
+
+    <script>
+        const sunlight = document.querySelector(".sunlight");
+
+        slider.addEventListener("input", () => {
+            const temp = Number(slider.value);
+
+            const sunIntensity = Math.max(0, (temp - 18) / 22);
+            sunlight.style.opacity = sunIntensity;
+        });
+
+    </script>
+
+</body>
+
+</html>
