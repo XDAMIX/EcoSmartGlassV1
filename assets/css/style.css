@@ -965,8 +965,8 @@ select {
 /* From Uiverse.io by gharsh11032000 */
 .card {
   position: relative;
-  width: 320px;
-  height: 220px;
+  width: 350px;
+  height: 250px;
   background-color: #f2f2f2;
   border-radius: 10px;
   display: flex;
